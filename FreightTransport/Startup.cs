@@ -41,17 +41,19 @@ namespace FreightTransport
             services.AddTransient<ICarDriverRepository, CarDriverRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
             services.AddTransient<ICityRepository, CityRepository>();
-            services.AddTransient<IRouteRepository, RouteRepository>();
             services.AddTransient<ITransportationRepository, TransportationRepository>();
+            services.AddTransient<IDriverSalaryRepository, DriverSalaryRepository>();
+            services.AddTransient<IClientRepository, ClientRepository>();
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             services.AddTransient<ICarDriverService, CarDriverService>();
             services.AddTransient<ICarService, CarService>();
             services.AddTransient<ICargoService, CargoService>();
-            services.AddTransient<IRouteService, RouteService>();
             services.AddTransient<ICityService, CityService>();
             services.AddTransient<ITransportationService, TransportationService>();
+            services.AddTransient<IDriverSalaryService, DriverSalaryService>();
+            services.AddTransient<IClientService, ClientService>();
 
             services.AddAutoMapper(typeof(MainMappingProfile));
 
@@ -63,7 +65,7 @@ namespace FreightTransport
                 .AddIdentityServerAuthentication("Bearer", options =>
                 {
                     options.ApiName = "freighttransportapi";
-                    options.Authority = "https://localhost:44330";
+                    options.Authority = "https://localhost:44366";
                 });
 
             services.AddSwaggerGen(c =>

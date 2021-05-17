@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 
 namespace FreightTransport_Client
 {
@@ -33,8 +34,11 @@ namespace FreightTransport_Client
 
             services.AddTransient<ICarService, CarService>();
             services.AddTransient<ICarDriverService, CarDriverService>();
-            services.AddTransient<IRouteService, RouteService>();
             services.AddTransient<ICityService, CityService>();
+            services.AddTransient<ITransportationService, TransportationService>();
+            services.AddTransient<ICargoService, CargoService>();
+            services.AddTransient<IClientService, ClientService>();
+            services.AddTransient<IDriverSalaryService, DriverSalaryService>();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
@@ -53,6 +57,7 @@ namespace FreightTransport_Client
             //{
             //    client.BaseAddress = new Uri("https://localhost:44368/");
             //});
+            services.AddBlazoredLocalStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,6 +78,8 @@ namespace FreightTransport_Client
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using FreightTransport_Client.Data.Enums;
 
 namespace FreightTransport_Client.Data.Services
 {
@@ -26,6 +27,7 @@ namespace FreightTransport_Client.Data.Services
 
         public async Task<IEnumerable<CarModel>> GetAllCars()
         {
+
             var response = await _http.GetAsync("Car/GetAllCars");
 
             var responseContent = await response.Content.ReadAsStreamAsync();
@@ -58,6 +60,21 @@ namespace FreightTransport_Client.Data.Services
             if (response.StatusCode == HttpStatusCode.OK)
                 return true;
             return false;
+        }
+
+        public async Task<ResponceCarsModel> GetFreeCarsOfSelectedType(CarType carType)
+        {
+            var response = await _http.GetAsync($"Car/GetFreeCarsOfSelectedType/{carType}");
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var cars = await response.Content.ReadFromJsonAsync<IEnumerable<CarModel>>();
+                return new ResponceCarsModel {Cars = cars};
+            }
+
+            if (response.StatusCode == HttpStatusCode.NoContent)
+                return new ResponceCarsModel {Message = "No such cars", StatusCode = HttpStatusCode.NoContent};
+
+            return new ResponceCarsModel {Message = "Something goes wrong", StatusCode = HttpStatusCode.NotFound};
         }
     }
 }
