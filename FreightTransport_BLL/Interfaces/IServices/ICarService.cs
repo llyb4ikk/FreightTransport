@@ -14,5 +14,6 @@ namespace FreightTransport_BLL.Interfaces.IServices
         Task<bool> DeleteCarAsync(int id);
 
         Task<IEnumerable<CarDTO>> GetFreeCarsOfSelectedType(CarType carType);
+        Task<bool> SetCarFree(int carId);
     }
 }

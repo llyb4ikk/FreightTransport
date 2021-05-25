@@ -6,7 +6,7 @@ namespace FreightTransport_Client.Data.Interfaces
 {
     public interface ITransportationService
     {
-        //Task<TransportationTableModel> GetTransportationById(int id);
+        Task<TransportationModel> GetTransportationById(int id);
         Task<TransportationInfoModel> GetTransportationInfoById(int id);
         Task<IEnumerable<TransportationTableModel>> GetAllTransportationsTable();
         Task<TransportationModel> AddTransportation(TransportationModel transportationModel);

@@ -13,11 +13,13 @@ namespace FreightTransport_BLL.Services
     public class TransportationService : ITransportationService
     {
         private readonly IUnitOfWork _db;
+        private readonly ICarService _carService;
         private readonly IMapper _mapper;
-        public TransportationService(IUnitOfWork db, IMapper mapper)
+        public TransportationService(IUnitOfWork db, IMapper mapper, ICarService carService)
         {
             _db = db;
             _mapper = mapper;
+            _carService = carService;
         }
 
         public async Task<TransportationDTO> GetTransportationByIdAsync(int id)
@@ -89,6 +91,9 @@ namespace FreightTransport_BLL.Services
 
             if(transportation.Status != TransportationStatus.Done)
                 transportation.Status++;
+
+            if (transportation.Status == TransportationStatus.Done)
+                _carService.SetCarFree(transportation.CarId);
 
             var result = await _db.TransportationRepository.UpdateAsync(transportation);
             if (result != null) return true;

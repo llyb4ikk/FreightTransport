@@ -18,6 +18,11 @@ namespace FreightTransport_Client.Data.Services
         }
 
 
+        public async Task<TransportationModel> GetTransportationById(int id)
+        {
+            return await _http.GetFromJsonAsync<TransportationModel>($"Transportation/GetTransportationById/{id}");
+        }
+
         public async Task<TransportationInfoModel> GetTransportationInfoById(int id)
         {
             return await _http.GetFromJsonAsync<TransportationInfoModel>(

@@ -4,6 +4,7 @@ using AutoMapper;
 using FreightTransport_BLL.DTOs;
 using FreightTransport_BLL.Interfaces.IServices;
 using FreightTransport_DAL.Entities;
+using FreightTransport_DAL.Enums;
 using FreightTransport_DAL.Interfaces;
 
 namespace FreightTransport_BLL.Services
@@ -83,15 +84,20 @@ namespace FreightTransport_BLL.Services
         public async Task<CargoDTO> AddCargoToTransportation(int cargoId, int transportationId)
         {
             var cargo = await _db.CargoRepository.GetByIdAsync(cargoId);
-            cargo.TransportationId = transportationId;
+            var transportation = await _db.TransportationRepository.GetByIdAsync(transportationId);
+            if(transportation.Status == TransportationStatus.Formed) cargo.TransportationId = transportationId;
             return _mapper.Map<CargoDTO>(await _db.CargoRepository.UpdateAsync(cargo));
         }
 
         public async Task<CargoDTO> RemoveCargoToTransportation(int cargoId)
         {
             var cargo = await _db.CargoRepository.GetByIdAsync(cargoId);
-            cargo.TransportationId = null;
-            return _mapper.Map<CargoDTO>(await _db.CargoRepository.UpdateAsync(cargo));
+
+            Transportation transportation = null;
+            if (cargo.TransportationId != null) transportation = await _db.TransportationRepository.GetByIdAsync((int) cargo.TransportationId);
+            if (transportation.Status == TransportationStatus.Formed) cargo.TransportationId = null;
+
+           return _mapper.Map<CargoDTO>(await _db.CargoRepository.UpdateAsync(cargo));
         }
     }
 }

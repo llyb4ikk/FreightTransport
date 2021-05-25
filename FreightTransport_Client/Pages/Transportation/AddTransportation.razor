@@ -175,6 +175,7 @@
         set
         {
             _startCityModels = value;
+            StartCity = value.FirstOrDefault().Id;
             StateHasChanged();
         }
     }
@@ -184,6 +185,7 @@
         set
         {
             _destinationCityModels = value;
+            DestinationCity = value.FirstOrDefault().Id;
             StateHasChanged();
         }
     }
@@ -245,7 +247,17 @@
         if (dc != null) transportationModel.DestinationCityId = dc.Select(c => c.Id).FirstOrDefault();
     }
 
-    private IEnumerable<CarModel> FreeCars;
+    private IEnumerable<CarModel> _freeCars;
+    private IEnumerable<CarModel> FreeCars
+    {
+        get => _freeCars;
+        set
+        {
+            _freeCars = value;
+            if(value != null) SelectedCarModelId = value.FirstOrDefault().Id;
+            StateHasChanged();
+        }
+    }
     private CarType _selectedCarType;
     private CarType SelectedCarType
     {
@@ -286,11 +298,19 @@
         set
         {
             _freeCarDriverModels = value;
+            CarDriver1 = value.FirstOrDefault().Id;
             StateHasChanged();
         }
     }
 
-    private int CarDriver1 { get; set; }
+    private int _carDriver1;
+    private int _carDriver2;
+    private int CarDriver1
+    {
+        get => _carDriver1;
+        set { _carDriver1 = value; }
+
+    }
     private int CarDriver2 { get; set; }
 
     protected override async Task OnInitializedAsync() => FreeCarDriverModels = await carDriverService.GetAllFreeCarDrivers();
@@ -304,20 +324,24 @@
         {
             if (CarDriver1 != 0)
             {
+                var carDriver = await carDriverService.GetCarDriverById(CarDriver1);
+                var salary = transportationModel.Distance * ((CarDriver2 == 0) ? 1.5 : 1) * (1 + (carDriver.Experience / 20));
+
                 var carDriver1Res = await driverSalaryService.AddDriverSalary(new DriverSalaryModel
                 {
                     TransportationId = result.Id,
                     CarDriverId = CarDriver1,
-                    Salary = transportationModel.Distance * 3
+                    Salary = salary
                 });
             }
             if (CarDriver2 != 0)
             {
+                var carDriver = await carDriverService.GetCarDriverById(CarDriver1);
                 var carDriver1Res = await driverSalaryService.AddDriverSalary(new DriverSalaryModel
                 {
                     TransportationId = result.Id,
                     CarDriverId = CarDriver2,
-                    Salary = transportationModel.Distance * 3
+                    Salary = transportationModel.Distance * 1 * (1 + (carDriver.Experience / 20))
                 });
             }
         }
@@ -340,7 +364,7 @@
             transportationModel.Distance = (int) Math.Sqrt(Math.Pow((startCity.Latitude - destinationCity.Latitude), 2) + Math.Pow((startCity.Longitude - destinationCity.Longitude), 2)) * 100;
 
             //finding approximately cost of transportation
-            transportationModel.Cost = (int) (transportationModel.Distance * (car.FuelConsumption / 100) * 25);
+            transportationModel.Cost = (int) ((transportationModel.Distance * 5) + (((car.FuelConsumption / 100) * 25) * transportationModel.Distance));
 
             StateHasChanged();
         }

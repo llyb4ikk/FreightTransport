@@ -5,6 +5,7 @@
 @inject ITransportationService transportationService
 @inject ICargoService cargoService
 @inject IDriverSalaryService driverSalaryService
+@inject ICarService carService
 @inject NavigationManager navigationManager;
 
 
@@ -27,6 +28,7 @@
                     {
                         <div class="col-12">
                             <h4 class="row">@TransportationInfoModel.StartCity, @TransportationInfoModel.StartRegion obl</h4>
+                            <h5 class="row">@TransportationInfoModel.StartDate.ToLongDateString()</h5>
 
                             <div class="row">
                                 <div class="col-12">
@@ -39,30 +41,38 @@
                                 </div>
                             </div>
 
+                            <h5 class="row">@TransportationInfoModel.ArrivalDate.ToLongDateString()</h5>
                             <h4 class="row">@TransportationInfoModel.DestinationCity, @TransportationInfoModel.DestinationRegion obl</h4>
-                        </div><br/>
+                        </div><br />
 
-                        <div class="col-4"><button class="btn btn-primary" @onclick="NextStage">next stage</button></div><br/>
+                        <div class="col-4"><button class="btn btn-primary" @onclick="NextStage">next stage</button></div><br />
 
                         <div class="col-12">
                             <h5 class="row">Distance: @TransportationInfoModel.Distance kilometers</h5>
                             <h5 class="row">Cost: @TransportationInfoModel.Cost$</h5>
-                        </div><br/><br/>
+                        </div><br /><br />
                     }
-                    
+
+                    <h4>Car:</h4>
+                    @if (CarModel != null)
+                    {
+                         <h6>Model: @CarModel.Model</h6>
+                         <h6>Car type: @CarModel.CarType</h6>
+                         <h6>Carrying capacity: @CarModel.CarryingCapacity tons</h6><br />
+                    }
 
                     <h4>Drivers:</h4>
                     @if (driverSalaryInfoModels != null)
                     {
                         foreach (var driverSalary in driverSalaryInfoModels)
                         {
-                            <h5>@driverSalary.Name, @driverSalary.Surname, @driverSalary.MiddleName</h5> 
-                            <h6>@driverSalary.Experience years of experience</h6> 
-                            <h6>Salary: @driverSalary.Salary$"</h6><br/>
+                            <h5>@driverSalary.Name, @driverSalary.Surname, @driverSalary.MiddleName</h5>
+                            <h6>@driverSalary.Experience years of experience</h6>
+                            <h6>Salary: @driverSalary.Salary$"</h6><br />
                         }
-                        
+
                     }
-                    
+
                 </div>
 
                 <div class="col-7">
@@ -158,11 +168,35 @@
         }
     }
 
+    private CarModel carModel;
+
+    private CarModel CarModel
+    {
+        get => carModel;
+        set
+        {
+            carModel = value;
+            StateHasChanged();
+        }
+    }
+    private TransportationModel transportationm;
+    private TransportationModel transportationMod
+    {
+        get => transportationm;
+        set
+        {
+            transportationm = value;
+            setCar();
+        }
+    }
+
+    private async Task setCar() => CarModel = await carService.GetCarById(transportationMod.CarId);
     private async Task SetCargoTableModels()
     {
         CargoTableModels = await cargoService.GetAllCargoModelsBytransportationId(TransportationInfoModel.Id);
         ListOfCargoWithoutTransportation = await cargoService.GetAllCargoModelsWithoutTransportation();
         driverSalaryInfoModels = await driverSalaryService.GetDriverSalariesInformationByTransportation(TransportationInfoModel.Id);
+        transportationMod = await transportationService.GetTransportationById(TransportationInfoModel.Id);
     }
 
     private IEnumerable<CargoTableModel> _cargoTableModels;

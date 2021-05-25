@@ -62,5 +62,14 @@ namespace FreightTransport_BLL.Services
             if (result != null) return _mapper.Map<IEnumerable<CarDTO>>(result);
             return null;
         }
+
+        public async Task<bool> SetCarFree(int carId)
+        {
+            var car = await _db.CarRepository.GetByIdAsync(carId);
+            car.Status = CarStatus.Free;
+
+            var result = await _db.CarRepository.UpdateAsync(car);
+            return true;
+        }
     }
 }
